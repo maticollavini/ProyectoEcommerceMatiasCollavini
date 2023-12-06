@@ -1,27 +1,31 @@
-import { useEffect, useState } from "react"
-import { mFetch } from "../../helpers/mFetch"
-import { useParams } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import ItemDetail from "../ItemDetail/ItemDetail";
+import Loading from "../Loading/Loading";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
-export const ItemDetailContainer = () => {
-    const [ product, setProduct ] = useState({})
-    useParams()
-    useEffect(()=>{
-        mFetch(1)
-        .then(resultado => setProduct(resultado))
-        .catch(error => console.log(error))
-    }, [])
-    return (
-        <div className="row">
-            <div className="col-6 mt-5">
-                <img src={product.imgUrl} alt="" className="img-fluid" />
-            </div>
-            <div className="col-6 text-center mt-5">
+function ItemDetailContainer() {
+  const [item, setItem] = useState({});
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
 
-                    <p>Nombre: {product.name}</p>
-                    <p>Categoria: {product.category}</p>
-                    <p>Precio: {product.price}</p>
+  useEffect(() => {
+    setLoading(true);
+    const queryDb = getFirestore();
+    const queryDoc = doc(queryDb, 'products', id);
 
-            </div>
-        </div>
-    )
+    getDoc(queryDoc)
+      .then((r) => setItem({ id: r.id, ...r.data() }))
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false); 
+      });
+  }, [id]);
+
+  if (loading) return <Loading />;
+  return <ItemDetail item={item} />;
 }
+
+export default ItemDetailContainer;

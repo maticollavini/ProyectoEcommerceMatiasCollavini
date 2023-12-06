@@ -1,27 +1,32 @@
-import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
-
-import NavBar from './components/NavBar/NavBar'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import './App.css'
 import ItemListContainer from './components/ItemListContainer/ItemListContainer'
-import { ItemDetailContainer } from "./components/ItemDetailContainer/ItemDetailContainer";
-import CartContainer from "./components/CartContainer/CartContainer";
-
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-
+import NavBar from './components/NavBar/Navbar'
+import ItemDetailContainer from './components/ItemDetailContainer/ItemDetailContainer'
+import Error from './components/Error/Error'
+import "./services/firebase"
+import CartContextProvider from './components/context/CartContext'
+import CartList from './components/CartWidget/CartList'
+import Chekin from './components/Chekin/Chekin'
 
 function App() {
-
-return (
+  return (
+    <div>
     <BrowserRouter>
-        <NavBar />
-            <Routes>
-                <Route path="/" element={<ItemListContainer greeting='Tienda de ropa online' />} />
-                <Route path="/detail/:pid" element={<ItemDetailContainer />} />
-                <Route path="/cart" element={<CartContainer />} />
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+     <CartContextProvider>
+       <NavBar/>
+       <Routes>
+          <Route path='/' element={<ItemListContainer greeting='Bienvenidos a todo software'/>}/>
+          <Route path='/cart' element={<CartList />} />
+          <Route path='/category/:id' element={<ItemListContainer/>}/>
+          <Route path='/item/:id' element={<ItemDetailContainer/>}/>
+          <Route path='/chekin' element={<Chekin/>}/>
+          <Route path='*' element={<Error/>}/>
+       </Routes>
+     </CartContextProvider>
     </BrowserRouter>
-    )
+    </div>
+  )
 }
 
-export default App 
+export default App

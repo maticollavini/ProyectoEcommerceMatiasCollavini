@@ -1,26 +1,21 @@
-import { Link } from "react-router-dom"
+import Item from "../Item/Item";
+import PropTypes from "prop-types";
 
-export const ItemList = ({products}) => {
-    return (
+const ItemList = ({ item }) => {
+  return (
+    <div id="itemlist" className="prods">
+      {item.map(item => 
+        <div key={item.id}>
+          <Item item={item} />
+        </div>
+      )}
+    </div>
+  );
+};
 
-        <>
-            {
-    products.map(product => 
-                                        <div className="card w-25">
-                                        <img className="card-img-top" src={product.imgUrl}/>
-                                        <div className="card-body">
-                                            <p>Nombre : {product.name}</p>
-                                            <p>Categoria : {product.category}</p>
-                                            <p>Precio : {product.price}</p>
-                                        </div>
-                                        <div className="card-footer">
-                                            <Link to={`/detail/${product.id}`}>
-                                            <button className="btn btn-outline-dark w-100">detalle</button>
-                                            </Link>
-                                        </div>
-                                        </div>
-                                    
-        )
-    }
-    </>
-)}
+ItemList.propTypes = {
+  item: PropTypes.array.isRequired,
+};
+
+
+export default ItemList;

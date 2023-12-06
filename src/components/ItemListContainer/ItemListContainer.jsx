@@ -1,32 +1,50 @@
-import { useEffect, useState } from "react"
-import { mFetch } from "../../helpers/mFetch"
-import { ItemList } from "../ItemList/ItemList"
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import ItemList from "../ItemList/ItemList";
+import Loading from "../Loading/Loading";
+import { getFirestore, collection, getDocs, where, query } from "firebase/firestore";
+// eslint-disable-next-line react/prop-types
+const ItemListContainer = ({ greeting }) => {
+  const [item, setItem] = useState([])
+    const [loading, setLoading] = useState(true)
+    const { id } = useParams()
 
-const ItemListContainer = ({greeting = "saludando por defecto"}) => {
-    const [ products, setProducts] = useState([])
-    const [ loading, setLoading] = useState(true)
-
-    useEffect(()=>{
-        mFetch()
-        .then(resultado => setProducts(resultado))
-        .catch(error => console.log(error))
-        .finally(()=> setLoading(!loading))
-    }, [])
-
-    return (
-        <>
-        <div className="text-center">
-            <h1>{greeting}</h1>    
-        </div>
-        {   loading ? <h2>Cargando...</h2> 
-            :
-            <div className="row">
-                <ItemList products={products}/>
-            </div>
-        }
-        </>
+    useEffect(() => {
+      setLoading(true);
     
+      const queryDb = getFirestore();
+      const queryCollect = collection(queryDb, 'products');
+    
+      let queryFilter;
+    
+      if (id) {
+        queryFilter = query(queryCollect, where('categoryId', '==', id));
+      }
+    
+    const fetchData = async () => {
+      try {
+        const result = id ? await getDocs(queryFilter) : await getDocs(queryCollect);
+        setItem(result.docs.map((p) => ({ id: p.id, ...p.data() })));
+      }catch (error) {
+        console.error("ERROR", error);
+      }finally {
+        setLoading(false);
+        }
+      };
+      setTimeout(() => {
+        fetchData();
+      }, 1500);
+    
+    }, [id]);
+    
+    
+    if (loading) return <Loading />
+    return (
+      <div>
+        <h2 className="greetdiv">{greeting}</h2>
+        <ItemList item={item} />
+      </div>
     )
 }
 
-export default ItemListContainer
+export default ItemListContainer;
